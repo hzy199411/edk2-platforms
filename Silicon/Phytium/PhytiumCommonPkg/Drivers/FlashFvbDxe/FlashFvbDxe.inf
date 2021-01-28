@@ -51,7 +51,7 @@
 [Protocols]
   gEfiDevicePathProtocolGuid
   gEfiFirmwareVolumeBlockProtocolGuid
-  gSpiNotFlashProtocolGuid
+  gSpiNorFlashProtocolGuid
 
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64
@@ -64,4 +64,4 @@
   gPhytiumPlatformTokenSpaceGuid.PcdSpiFlashSize
 
 [Depex]
-  gSpiNotFlashProtocolGuid
+  gSpiNorFlashProtocolGuid

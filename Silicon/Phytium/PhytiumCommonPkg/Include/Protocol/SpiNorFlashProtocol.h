@@ -11,7 +11,7 @@
 #define SPI_NORFALSH_H_
 
 typedef struct _EFI_NORFLASH_DRV_PROTOCOL EFI_NORFLASH_DRV_PROTOCOL;
-extern EFI_GUID gSpiNotFlashProtocolGuid;
+extern EFI_GUID gSpiNorFlashProtocolGuid;
 
 typedef struct {
   UINTN       DeviceBaseAddress;    // Start address of the Device Base Address (DBA)

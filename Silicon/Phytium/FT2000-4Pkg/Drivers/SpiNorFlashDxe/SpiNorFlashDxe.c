@@ -29,7 +29,7 @@ EFI_SPI_DRV_PROTOCOL *pSpiMasterProtocol;
 
 NorFlash_Device *flash_Instance;
 extern EFI_GUID gSpiMasterProtocolGuid;
-extern EFI_GUID gSpiNotFlashProtocolGuid;
+extern EFI_GUID gSpiNorFlashProtocolGuid;
 
 NOR_FLASH_DEVICE_DESCRIPTION mNorFlashDevices = {
     SPI_FLASH_BASE,   /* Device Base Address */
@@ -414,7 +414,7 @@ NorFlashPlatformEntryPoint (
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &(flash_Instance->Handle),
-                  &gSpiNotFlashProtocolGuid,
+                  &gSpiNorFlashProtocolGuid,
                   &(flash_Instance->FlashProtocol),
                   NULL
                   );

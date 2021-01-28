@@ -66,21 +66,21 @@ STATIC FT_FVB_DEVICE FvbFlashInstanceTemplate = {
       {
         HARDWARE_DEVICE_PATH,
         HW_VENDOR_DP,
-        { 
-          (UINT8)sizeof(VENDOR_DEVICE_PATH), 
-          (UINT8)((sizeof(VENDOR_DEVICE_PATH)) >> 8) 
+        {
+          (UINT8)sizeof(VENDOR_DEVICE_PATH),
+          (UINT8)((sizeof(VENDOR_DEVICE_PATH)) >> 8)
         }
       },
-      { 
-        0x0, 0x0, 0x0, { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 } 
-      }, // GUID ... NEED TO BE FILLED      
+      {
+        0x0, 0x0, 0x0, { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 }
+      }, // GUID ... NEED TO BE FILLED
     },
     {
       END_DEVICE_PATH_TYPE,
       END_ENTIRE_DEVICE_PATH_SUBTYPE,
-      { 
+      {
         sizeof (EFI_DEVICE_PATH_PROTOCOL),
-        0       
+        0
       }
     }
   },     // DevicePath
@@ -782,7 +782,7 @@ FvbRead (
   Writes the specified number of bytes from the input buffer to the block.
 
   The FvbWrite() function writes the specified number of bytes from
-  the provided buffer to the specified block and offset. 
+  the provided buffer to the specified block and offset.
 
   @param This                 EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL instance.
 
@@ -833,7 +833,7 @@ FvbWrite (
   Erases and initialises a firmware volume block.
 
   The FvbEraseBlocks() function erases one or more blocks as denoted
-  by the variable argument list. 
+  by the variable argument list.
 
   @param This                     EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL
                                   instance.
@@ -1056,7 +1056,7 @@ CreateInstance (
   NOR_FLASH_DEVICE_DESCRIPTION   *NorFlashDevice;
 
   // Locate flash protocols
-  Status = gBS->LocateProtocol (&gSpiNotFlashProtocolGuid,
+  Status = gBS->LocateProtocol (&gSpiNorFlashProtocolGuid,
                   NULL,
                   (VOID **)&FvbDevice->SpiFlashProtocol);
   if (EFI_ERROR (Status)) {

@@ -47,7 +47,7 @@
 
 [Protocols]
   gSpiMasterProtocolGuid
-  gSpiNotFlashProtocolGuid
+  gSpiNorFlashProtocolGuid
 
  [Depex]
   TRUE
