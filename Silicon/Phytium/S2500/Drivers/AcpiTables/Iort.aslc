@@ -1,0 +1,548 @@
+/** @file
+  Phytium ACPI ASL Sources.
+
+  Copyright (C) 2020, Phytium Technology Co Ltd. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include <IndustryStandard/Acpi.h>
+#include <IndustryStandard/Acpi62.h>
+#include <IndustryStandard/IoRemappingTable.h>
+#include <Platform.h>
+
+#define SMMU0_BASE 0x2c000000UL
+#define SMMU0_SIZE 0x400000
+
+#define SMMU1_BASE 0x2002c000000UL
+#define SMMU1_SIZE 0x400000
+
+#define SMMU2_BASE 0x4002c000000UL
+#define SMMU2_SIZE 0x400000
+
+#define SMMU3_BASE 0x6002c000000UL
+#define SMMU3_SIZE 0x400000
+
+#define PHYTIUM_ID_MAPPING(In, Num, Out, Ref, Flags)        \
+  {                                                         \
+    In,                                                     \
+    Num,                                                    \
+    Out,                                                    \
+    OFFSET_OF(ARM_EFI_ACPI_6_0_IO_REMAPPING_TABLE, Ref),    \
+    Flags                                                   \
+  }
+
+
+#pragma pack(1)
+
+typedef struct
+{
+  EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE       ItsNode;
+  UINT32                                   ItsIdentifiers;
+} ARM_EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE;
+
+typedef struct
+{
+  EFI_ACPI_6_0_IO_REMAPPING_RC_NODE        RcNode;
+  EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE       RcIdMap;
+} ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE;
+
+typedef struct {
+  EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE       Node;
+  EFI_ACPI_6_0_IO_REMAPPING_SMMU_INT        Context[32];
+  EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE        SmmuIdMap;
+} ARM_EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE;
+
+typedef struct
+{
+  EFI_ACPI_6_0_IO_REMAPPING_TABLE          Header;
+  ARM_EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE   ItsNode0;
+  ARM_EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE   ItsNode1;
+  ARM_EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE   ItsNode2;
+  ARM_EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE   ItsNode3;
+  ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE    RcNode0;
+  ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE    RcNode1;
+  ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE    RcNode2;
+  ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE    RcNode3;
+  ARM_EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE  SmmuNode0;
+  ARM_EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE  SmmuNode1;
+  ARM_EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE  SmmuNode2;
+  ARM_EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE  SmmuNode3;
+} ARM_EFI_ACPI_6_0_IO_REMAPPING_TABLE;
+
+#pragma pack ()
+
+ARM_EFI_ACPI_6_0_IO_REMAPPING_TABLE Iort =
+{
+  // EFI_ACPI_6_0_IO_REMAPPING_TABLE
+  {
+     PHYTIUM_ACPI_HEADER  // EFI_ACPI_DESCRIPTION_HEADER
+     (
+       EFI_ACPI_6_2_IO_REMAPPING_TABLE_SIGNATURE,
+       ARM_EFI_ACPI_6_0_IO_REMAPPING_TABLE,
+       EFI_ACPI_IO_REMAPPING_TABLE_REVISION
+     ),
+     6,  // NumNodes
+     sizeof (EFI_ACPI_6_0_IO_REMAPPING_TABLE),  // NodeOffset
+     0,  // Reserved
+  },
+  
+
+  //ARM_EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE_0
+  {
+    // EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE
+    {
+      // EFI_ACPI_6_0_IO_REMAPPING_NODE
+      {
+        EFI_ACPI_IORT_TYPE_ITS_GROUP,  // Type
+        sizeof (ARM_EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE), // Length
+        0,  // Revision
+        0,  // Reserved
+        0,  // NumIdMappings
+        0,  // IdReference
+      },
+      1,    // Number of ITSs
+    },
+    0,      // ItsIdentifiers
+  },
+
+  //ARM_EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE_1
+  {
+    // EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE
+    {
+      // EFI_ACPI_6_0_IO_REMAPPING_NODE
+      {
+        EFI_ACPI_IORT_TYPE_ITS_GROUP,  // Type
+        sizeof (ARM_EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE), // Length
+        0,  // Revision
+        0,  // Reserved
+        0,  // NumIdMappings
+        0,  // IdReference
+      },
+      1,    // Number of ITSs
+    },
+    1,      // ItsIdentifiers
+  },
+
+  //ARM_EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE_2
+  {
+    // EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE
+    {
+      // EFI_ACPI_6_0_IO_REMAPPING_NODE
+      {
+        EFI_ACPI_IORT_TYPE_ITS_GROUP,  // Type
+        sizeof (ARM_EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE), // Length
+        0,  // Revision
+        0,  // Reserved
+        0,  // NumIdMappings
+        0,  // IdReference
+      },
+      1,    // Number of ITSs
+    },
+    2,      // ItsIdentifiers
+  },
+    //ARM_EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE_3
+  {
+    // EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE
+    {
+      // EFI_ACPI_6_0_IO_REMAPPING_NODE
+      {
+        EFI_ACPI_IORT_TYPE_ITS_GROUP,  // Type
+        sizeof (ARM_EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE), // Length
+        0,  // Revision
+        0,  // Reserved
+        0,  // NumIdMappings
+        0,  // IdReference
+      },
+      1,    // Number of ITSs
+    },
+    3,      // ItsIdentifiers
+  },
+
+  // ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE0
+  {
+    // EFI_ACPI_6_0_IO_REMAPPING_RC_NODE
+    {
+      // EFI_ACPI_6_0_IO_REMAPPING_NODE
+      {
+        EFI_ACPI_IORT_TYPE_ROOT_COMPLEX,  // Type
+        sizeof (ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE),  // Length
+        1,  // Revision
+        0,  // Reserved
+        1,  // NumIdMappings
+        OFFSET_OF (ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE, RcIdMap)  // IdReference
+      },
+      EFI_ACPI_IORT_MEM_ACCESS_PROP_CCA,  // CacheCoherent
+      0,  // AllocationHints
+      0,  // Reserved
+      EFI_ACPI_IORT_MEM_ACCESS_FLAGS_CPM |
+      EFI_ACPI_IORT_MEM_ACCESS_FLAGS_DACS,  // MemoryAccessFlags
+      EFI_ACPI_IORT_ROOT_COMPLEX_ATS_UNSUPPORTED,  // AtsAttribute
+      0x0,                                         // PciSegmentNumber
+      48,
+      {0}
+    },
+    // EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE
+    PHYTIUM_ID_MAPPING (0, 0xFFFF, 0x0, SmmuNode0, 0),
+    //PHYTIUM_ID_MAPPING (0, 0xFFFF, 0x0, ItsNode1, 0),
+  },
+
+  // ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE_1
+  {
+    // EFI_ACPI_6_0_IO_REMAPPING_RC_NODE
+    {
+      // EFI_ACPI_6_0_IO_REMAPPING_NODE
+      {
+        EFI_ACPI_IORT_TYPE_ROOT_COMPLEX,  // Type
+        sizeof (ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE),  // Length
+        1,  // Revision
+        0,  // Reserved
+        1,  // NumIdMappings
+        OFFSET_OF (ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE, RcIdMap)  // IdReference
+      },
+      EFI_ACPI_IORT_MEM_ACCESS_PROP_CCA,  // CacheCoherent
+      0,  // AllocationHints
+      0,  // Reserved
+      EFI_ACPI_IORT_MEM_ACCESS_FLAGS_CPM |
+      EFI_ACPI_IORT_MEM_ACCESS_FLAGS_DACS,  // MemoryAccessFlags
+      EFI_ACPI_IORT_ROOT_COMPLEX_ATS_UNSUPPORTED,  // AtsAttribute
+      0x1,                                         // PciSegmentNumber
+      48,
+      {0},
+    },
+    // EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE
+    PHYTIUM_ID_MAPPING (0, 0xFFFF, 0x0, SmmuNode1, 0),
+    //PHYTIUM_ID_MAPPING(0, 0xFFFF, 0x0, ItsNode1, 0),
+  },
+    // ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE_2
+  {
+    // EFI_ACPI_6_0_IO_REMAPPING_RC_NODE
+    {
+      // EFI_ACPI_6_0_IO_REMAPPING_NODE
+      {
+        EFI_ACPI_IORT_TYPE_ROOT_COMPLEX,  // Type
+        sizeof (ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE),  // Length
+        1,  // Revision
+        0,  // Reserved
+        1,  // NumIdMappings
+        OFFSET_OF (ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE, RcIdMap)  // IdReference
+      },
+      EFI_ACPI_IORT_MEM_ACCESS_PROP_CCA,  // CacheCoherent
+      0,  // AllocationHints
+      0,  // Reserved
+      EFI_ACPI_IORT_MEM_ACCESS_FLAGS_CPM |
+      EFI_ACPI_IORT_MEM_ACCESS_FLAGS_DACS,  // MemoryAccessFlags
+      EFI_ACPI_IORT_ROOT_COMPLEX_ATS_UNSUPPORTED,  // AtsAttribute
+      0x2,                                         // PciSegmentNumber
+    },
+    // EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE
+    PHYTIUM_ID_MAPPING (0, 0xFFFF, 0x0, SmmuNode2, 0),
+    //PHYTIUM_ID_MAPPING(0, 0xFFFF, 0x0, ItsNode1, 0),
+  },
+    // ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE_3
+  {
+    // EFI_ACPI_6_0_IO_REMAPPING_RC_NODE
+    {
+      // EFI_ACPI_6_0_IO_REMAPPING_NODE
+      {
+        EFI_ACPI_IORT_TYPE_ROOT_COMPLEX,  // Type
+        sizeof (ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE),  // Length
+        1,  // Revision
+        0,  // Reserved
+        1,  // NumIdMappings
+        OFFSET_OF (ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE, RcIdMap)  // IdReference
+      },
+      EFI_ACPI_IORT_MEM_ACCESS_PROP_CCA,  // CacheCoherent
+      0,  // AllocationHints
+      0,  // Reserved
+      EFI_ACPI_IORT_MEM_ACCESS_FLAGS_CPM |
+      EFI_ACPI_IORT_MEM_ACCESS_FLAGS_DACS,  // MemoryAccessFlags
+      EFI_ACPI_IORT_ROOT_COMPLEX_ATS_UNSUPPORTED,  // AtsAttribute
+      0x3,                                         // PciSegmentNumber
+    },
+    // EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE
+    PHYTIUM_ID_MAPPING (0, 0xFFFF, 0x0, SmmuNode3, 0),
+    //PHYTIUM_ID_MAPPING(0, 0xFFFF, 0x0, ItsNode1, 0),
+  },
+
+#if 1
+  // ARM_EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE_0
+  {
+    // EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE
+    {
+      // EFI_ACPI_6_0_IO_REMAPPING_NODE
+      {
+        EFI_ACPI_IORT_TYPE_SMMUv1v2,  // Type
+        sizeof (ARM_EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE), // Length
+        1,  // Revision
+        0,  // Reserved
+        1,  // NumIdMappings
+        OFFSET_OF (ARM_EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE, SmmuIdMap)  // IdReference
+      },
+      SMMU0_BASE,
+      SMMU0_SIZE,
+      EFI_ACPI_IORT_SMMUv1v2_MODEL_MMU500,
+      EFI_ACPI_IORT_SMMUv1v2_FLAG_COH_WALK,
+      OFFSET_OF(EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE,
+                 SMMU_NSgIrpt),
+      32,
+      sizeof(EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE),
+      0x0,
+      0x0,
+      0x1C8,
+      EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL,
+      0x0,
+      0x0,
+    },
+    //EFI_ACPI_6_0_IO_REMAPPING_SMMU_INT
+    {
+      {0xC8, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0xD0, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0xD8, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0xE0, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0xE8, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0xF0, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0xF8, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x100, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x108, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x110, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x118, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x120, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x128, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x130, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x138, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x140, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x148, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x150, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x158, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x160, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x168, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x170, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x178, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x180, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x188, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x190, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x198, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x1A0, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x1A8, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x1B0, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x1B8, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x1C0, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+    },
+    // EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE
+    // map to ITS node
+    PHYTIUM_ID_MAPPING(0x0, 0xFFFF, 0x0, ItsNode0, 0),
+  },
+#endif
+#if 1
+  // ARM_EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE_1
+  //SMMU1
+  {
+   // EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE
+    {
+      // EFI_ACPI_6_0_IO_REMAPPING_NODE
+      {
+        EFI_ACPI_IORT_TYPE_SMMUv1v2,  // Type
+        sizeof (ARM_EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE), // Length
+        1,  // Revision
+        0,  // Reserved
+        1,  // NumIdMappings
+        OFFSET_OF (ARM_EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE, SmmuIdMap)  // IdReference
+      },
+      SMMU1_BASE,
+      SMMU1_SIZE,
+      EFI_ACPI_IORT_SMMUv1v2_MODEL_MMU500,
+      EFI_ACPI_IORT_SMMUv1v2_FLAG_COH_WALK,
+      OFFSET_OF(EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE,
+                 SMMU_NSgIrpt),
+      32,
+      sizeof(EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE),
+      0x0,
+      0x0,
+      0x1C9,
+      EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL,
+      0x0,
+      0x0,
+    },
+    //EFI_ACPI_6_0_IO_REMAPPING_SMMU_INT
+    {
+      {0xC9, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0xD1, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0xD9, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0xE1, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0xE9, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0xF1, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0xF9, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x101, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x109, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x111, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x119, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x121, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x129, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x131, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x139, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x141, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x149, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x151, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x159, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x161, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x169, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x171, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x179, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x181, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x189, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x191, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x199, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x1A1, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x1A9, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x1B1, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x1B9, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x1C1, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+    },
+    // EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE
+    // map to ITS node
+	PHYTIUM_ID_MAPPING (0x0, 0x10000, 0x0, ItsNode1, 0),
+  },
+
+// ARM_EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE_2
+  //SMMU1
+  {
+   // EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE
+    {
+      // EFI_ACPI_6_0_IO_REMAPPING_NODE
+      {
+        EFI_ACPI_IORT_TYPE_SMMUv1v2,  // Type
+        sizeof (ARM_EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE), // Length
+        1,  // Revision
+        0,  // Reserved
+        1,  // NumIdMappings
+        OFFSET_OF (ARM_EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE, SmmuIdMap)  // IdReference
+      },
+      SMMU2_BASE,
+      SMMU2_SIZE,
+      EFI_ACPI_IORT_SMMUv1v2_MODEL_MMU500,
+      EFI_ACPI_IORT_SMMUv1v2_FLAG_COH_WALK,
+      OFFSET_OF(EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE,
+                 SMMU_NSgIrpt),
+      32,
+      sizeof(EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE),
+      0x0,
+      0x0,
+      0x1Ca,
+      EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL,
+      0x0,
+      0x0,
+    },
+    //EFI_ACPI_6_0_IO_REMAPPING_SMMU_INT
+    {
+      {0xCa, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0xD2, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0xDa, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0xE2, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0xEa, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0xF2, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0xFa, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x102, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x10a, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x112, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x11a, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x122, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x12a, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x132, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x13a, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x142, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x14a, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x152, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x15a, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x162, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x16a, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x172, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x17a, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x182, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x18a, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x192, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x19a, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x1A2, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x1Aa, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x1B2, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x1Ba, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x1C2, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+    },
+    // EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE
+    // map to ITS node
+	PHYTIUM_ID_MAPPING (0x0, 0x10000, 0x0, ItsNode2, 0),
+  },
+  // ARM_EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE_3
+  //SMMU1
+  {
+   // EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE
+    {
+      // EFI_ACPI_6_0_IO_REMAPPING_NODE
+      {
+        EFI_ACPI_IORT_TYPE_SMMUv1v2,  // Type
+        sizeof (ARM_EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE), // Length
+        1,  // Revision
+        0,  // Reserved
+        1,  // NumIdMappings
+        OFFSET_OF (ARM_EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE, SmmuIdMap)  // IdReference
+      },
+      SMMU3_BASE,
+      SMMU3_SIZE,
+      EFI_ACPI_IORT_SMMUv1v2_MODEL_MMU500,
+      EFI_ACPI_IORT_SMMUv1v2_FLAG_COH_WALK,
+      OFFSET_OF(EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE,
+                 SMMU_NSgIrpt),
+      32,
+      sizeof(EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE),
+      0x0,
+      0x0,
+      0x1Cb,
+      EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL,
+      0x0,
+      0x0,
+    },
+    //EFI_ACPI_6_0_IO_REMAPPING_SMMU_INT
+    {
+      {0xCb, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0xD3, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0xDb, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0xE3, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0xEb, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0xF3, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0xFb, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x103, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x10b, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x113, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x11b, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x123, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x12b, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x133, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x13b, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x143, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x14b, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x153, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x15b, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x163, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x16b, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x173, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x17b, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x183, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x18b, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x193, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x19b, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x1A3, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x1Ab, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x1B3, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x1Bb, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+      {0x1C3, EFI_ACPI_IORT_SMMUv1v2_INT_FLAG_LEVEL},
+    },
+    // EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE
+    // map to ITS node
+	PHYTIUM_ID_MAPPING (0x0, 0x10000, 0x0, ItsNode3, 0),
+  },
+
+#endif
+};
+
+VOID* CONST ReferenceAcpiTable = &Iort;
