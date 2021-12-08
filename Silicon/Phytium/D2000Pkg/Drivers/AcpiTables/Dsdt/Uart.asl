@@ -9,18 +9,6 @@
 
 Scope(_SB)
 {
-  //UART 1
-  Device(UAR1) {
-    Name(_HID, "ARMH0011")
-    Name(_UID, 1)
-    Name(_CRS, ResourceTemplate() {
-      Memory32Fixed(ReadWrite, 0x28001000, 0x1000)
-      Interrupt(ResourceConsumer, Level, ActiveHigh, Exclusive) {39}
-    })
-
-    Method (_STA, 0, NotSerialized) { Return(0x0F) }
-  }
-
   //UART 0
   Device(UAR0) {
     Name(_HID, "ARMH0011")
@@ -33,6 +21,18 @@ Scope(_SB)
     Method (_STA, 0, NotSerialized) {
     Return(0x0F)
     }
+  }
+
+  //UART 1
+  Device(UAR1) {
+    Name(_HID, "ARMH0011")
+    Name(_UID, 1)
+    Name(_CRS, ResourceTemplate() {
+      Memory32Fixed(ReadWrite, 0x28001000, 0x1000)
+      Interrupt(ResourceConsumer, Level, ActiveHigh, Exclusive) {39}
+    })
+
+    Method (_STA, 0, NotSerialized) { Return(0x0F) }
   }
 
   //UART 2
