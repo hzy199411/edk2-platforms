@@ -41,6 +41,9 @@
   PL011UartClockLib|ArmPlatformPkg/Library/PL011UartClockLib/PL011UartClockLib.inf
   PL011UartLib|ArmPlatformPkg/Library/PL011UartLib/PL011UartLib.inf
 
+  UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
+  OrderedCollectionLib|MdePkg/Library/BaseOrderedCollectionRedBlackTreeLib/BaseOrderedCollectionRedBlackTreeLib.inf
+
 [LibraryClasses.common.PEIM]
   PlatformPeiLib|Silicon/Phytium/D2000Pkg/PlatformPei/PlatformPeiLib.inf
 
@@ -58,19 +61,40 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVendor|L"Pomelo Platform"
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L"V1.0"
 
+  # DEBUG_ASSERT_ENABLED       0x01
+  # DEBUG_PRINT_ENABLED        0x02
+  # DEBUG_CODE_ENABLED         0x04
+  # CLEAR_MEMORY_ENABLED       0x08
+  # ASSERT_BREAKPOINT_ENABLED  0x10
+  # ASSERT_DEADLOOP_ENABLED    0x20
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2f
+
+  #  DEBUG_INIT      0x00000001  // Initialization
+  #  DEBUG_WARN      0x00000002  // Warnings
+  #  DEBUG_LOAD      0x00000004  // Load events
+  #  DEBUG_FS        0x00000008  // EFI File system
+  #  DEBUG_POOL      0x00000010  // Alloc & Free (pool)
+  #  DEBUG_PAGE      0x00000020  // Alloc & Free (page)
+  #  DEBUG_INFO      0x00000040  // Informational debug messages
+  #  DEBUG_DISPATCH  0x00000080  // PEI/DXE/SMM Dispatchers
+  #  DEBUG_VARIABLE  0x00000100  // Variable
+  #  DEBUG_BM        0x00000400  // Boot Manager
+  #  DEBUG_BLKIO     0x00001000  // BlkIo Driver
+  #  DEBUG_NET       0x00004000  // SNP Driver
+  #  DEBUG_UNDI      0x00010000  // UNDI Driver
+  #  DEBUG_LOADFILE  0x00020000  // LoadFile
+  #  DEBUG_EVENT     0x00080000  // Event messages
+  #  DEBUG_GCD       0x00100000  // Global Coherency Database changes
+  #  DEBUG_CACHE     0x00200000  // Memory range cachability changes
+  #  DEBUG_VERBOSE   0x00400000  // Detailed debug messages that may
+  #                              // significantly impact boot performance
+  #  DEBUG_ERROR     0x80000000  // Error
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
+
   gArmTokenSpaceGuid.PcdVFPEnabled|1
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask|0x301
   gArmTokenSpaceGuid.PcdArmPrimaryCore|0x0
   gArmPlatformTokenSpaceGuid.PcdCoreCount|8
-  #
-  # NV Storage PCDs.
-  #
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0xe00000
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize|0x00010000
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0xe10000
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize|0x00010000
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|0xe20000
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize|0x00010000
 
   # Size of the region used by UEFI in permanent memory (Reserved 64MB)
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x04000000
@@ -78,7 +102,7 @@
   #
   # PL011 - Serial Terminal
   #
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x28001000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x28000000
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultReceiveFifoDepth|0
   gArmPlatformTokenSpaceGuid.PL011UartClkInHz|48000000
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200
@@ -92,8 +116,8 @@
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x29c00000
 
   # System IO space
-  gPhytiumPlatformTokenSpaceGuid.PcdSystemIoBase|0x0
-  gPhytiumPlatformTokenSpaceGuid.PcdSystemIoSize|0x40000000
+  gPhytiumPlatformTokenSpaceGuid.PcdSystemIoBase|0x20000000
+  gPhytiumPlatformTokenSpaceGuid.PcdSystemIoSize|0x20000000
 
   # System Memory (2GB ~ 4GB - 64MB), the top 64MB is reserved for PBF
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x80000000
