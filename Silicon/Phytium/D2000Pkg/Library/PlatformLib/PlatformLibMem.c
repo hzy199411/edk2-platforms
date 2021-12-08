@@ -44,7 +44,7 @@ ArmPlatformGetVirtualMemoryMap (
   MEMORY_BLOCK                  *MemBlock = NULL;
   MEMORY_INFO                   *MemInfor = NULL;
   ARM_SMC_ARGS                  ArmSmcArgs;
-  UINT32                        MemBlockCnt = 0, Index, Index1;
+  UINT32                        MemBlockCnt = 0, Index = 0, Index1;
 
   CacheAttributes = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
 

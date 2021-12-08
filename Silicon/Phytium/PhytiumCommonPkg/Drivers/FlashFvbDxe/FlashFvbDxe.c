@@ -644,6 +644,8 @@ FvbGetPhysicalAddress (
   ASSERT (Address != NULL);
 
   FlashInstance = INSTANCE_FROM_FVB_THIS (This);
+  DEBUG ((DEBUG_BLKIO, "FvbGetPhysicalAddress(BaseAddress=0x%08x)\n",
+    FlashInstance->RegionBaseAddress));
 
   *Address = mFlashNvStorageVariableBase;
 
